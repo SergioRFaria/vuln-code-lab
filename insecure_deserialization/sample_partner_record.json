@@ -1,0 +1,6 @@
+{
+  "partner_name": "Acme Risk Analytics",
+  "contact_email": "ops@acme-risk.example",
+  "risk_tier": "medium",
+  "enabled": true
+}

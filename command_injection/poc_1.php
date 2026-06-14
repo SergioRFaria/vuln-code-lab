@@ -1,12 +1,16 @@
 <?php
-if (isset($_GET['filename'])) {
-    $file = $_GET['filename'];
+if (isset($_GET['bundle'])) {
+    $bundle = $_GET['bundle'];
 
-    $cmd = "convert uploads/$file -resize 200x200 uploads/resized_$file";
+    if (!is_dir(__DIR__ . '/exports')) {
+        mkdir(__DIR__ . '/exports', 0777, true);
+    }
+
+    $cmd = "tar -czf exports/latest-support-bundle.tar.gz bundles/$bundle 2>&1";
     $output = shell_exec($cmd);
 
     echo "<pre>$output</pre>";
 } else {
-    echo "Missing filename.";
+    echo "Missing bundle.";
 }
 ?>

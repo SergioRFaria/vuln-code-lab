@@ -7,21 +7,21 @@ A curated collection of intentionally vulnerable code snippets and mini web apps
 
 ## 🔍 Included Vulnerabilities
 
-| Vulnerability          | Folder                | Description                                        |
+| Vulnerability | Folder | Description |
 |------------------------|-----------------------|----------------------------------------------------|
-| Clickjacking           | /ui-redressing         | Iframe-based UI redressing without protection      |
-| Command Injection      | /command-injection    | Shell commands built from user input               |
-| XML External Entity    | /xxe                  | XML parsers resolving external entities            |
-| Path Traversal         | /path-traversal       | Files accessed via ../ in user input               |
-| Insecure Deserialization | /insecure_deserialization         | Python pickle abuse leading to RCE                 |
+| Clickjacking | `ui-redressing/` | Iframe-based UI redressing without protection |
+| Command Injection | `command_injection/` | Shell commands built from user input, with a vulnerable exporter and a complete safe fix |
+| XML External Entity | `xxe/` | XML parsers resolving external entities |
+| Path Traversal | `path_traversal/` | Files accessed via `../` in user input, including a naive and a complete fix |
+| Insecure Deserialization | `insecure_deserialization/` | Python pickle abuse leading to RCE, plus a naive restricted-pickle fix and a JSON-based safe fix |
 
 
 ## 📦 Requirements
 
 - Python 3.7 or higher
   - Flask
-  - (Optional) lxml, defusedxml for XXE-related examples
-- PHP 7.0 or higher (for command injection and file upload demos)
+  - `lxml` and `defusedxml` only for the XXE-related examples
+- PHP 7.0 or higher (for the command injection support bundle export demo)
 - Go 1.18 or higher (for path traversal and other backend-related PoCs)
 
 

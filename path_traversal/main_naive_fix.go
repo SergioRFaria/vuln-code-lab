@@ -87,26 +87,13 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	baseAbs, err := filepath.Abs(baseDir)
-	if err != nil {
-		http.Error(w, "Server configuration error", http.StatusInternalServerError)
-		return
-	}
-
-	requestedPath := filepath.Join(baseAbs, filename)
-	requestedAbs, err := filepath.Abs(requestedPath)
-	if err != nil {
-		http.Error(w, "Invalid file path", http.StatusBadRequest)
-		return
-	}
-
-	baseWithSeparator := baseAbs + string(filepath.Separator)
-	if requestedAbs != baseAbs && !strings.HasPrefix(requestedAbs, baseWithSeparator) {
+	cleanPath := filepath.Clean(filepath.Join(baseDir, filename))
+	if !strings.HasPrefix(cleanPath, filepath.Clean(baseDir)) {
 		http.Error(w, "Access denied", http.StatusForbidden)
 		return
 	}
 
-	data, err := ioutil.ReadFile(requestedAbs)
+	data, err := ioutil.ReadFile(cleanPath)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error reading file: %v", err), http.StatusInternalServerError)
 		return

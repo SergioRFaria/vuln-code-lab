@@ -1,0 +1,6 @@
+Case: case-5910
+Customer: Daniel Price
+Priority: Medium
+Artifacts:
+- statement-export.log
+- case-summary.txt

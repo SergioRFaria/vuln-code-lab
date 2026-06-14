@@ -1,6 +1,10 @@
-from flask import Flask, request
+from flask import Flask, redirect, url_for
 
 app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return redirect(url_for('settings'))
 
 @app.route('/settings')
 def settings():

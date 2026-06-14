@@ -1,7 +1,24 @@
 from flask import Flask, request, render_template_string
-import json
+import pickle
+import io
 
 app = Flask(__name__)
+
+# Custom restricted unpickler
+class RestrictedUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        # Only allow safe built-in types
+        allowed = {
+            "builtins": {"dict", "list", "str", "int", "float", "bool", "set", "tuple"}
+        }
+
+        if module in allowed and name in allowed[module]:
+            return super().find_class(module, name)
+        
+        raise pickle.UnpicklingError(f"Blocked unsafe class: {module}.{name}")
+
+def restricted_loads(s):
+    return RestrictedUnpickler(io.BytesIO(s)).load()
 
 PAGE = """
 <!doctype html>
@@ -44,10 +61,10 @@ PAGE = """
         <div class="layout">
             <div class="panel">
                 <h2>Upload Partner Record</h2>
-                <p class="subtle">Accepted format: JSON partner intake package from the current onboarding workflow.</p>
+                <p class="subtle">Accepted format: serialized partner intake package from the legacy broker workflow.</p>
                 <form action="/upload" method="post" enctype="multipart/form-data">
-                    <label for="datafile">JSON record file</label>
-                    <input id="datafile" type="file" name="datafile" accept=".json,application/json,text/json">
+                    <label for="picklefile">Serialized record file</label>
+                    <input id="picklefile" type="file" name="picklefile">
                     <button type="submit">Import Partner Record</button>
                 </form>
 
@@ -84,20 +101,20 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    f = request.files.get('datafile')
+    f = request.files.get('picklefile')
     if not f:
-        return render_page(error="No JSON record file was provided."), 400
+        return render_page(error="No serialized record file was provided."), 400
 
     data = f.read()
 
     try:
-        obj = json.loads(data.decode())
-    except UnicodeDecodeError:
-        return render_page(error="Uploaded file is not valid UTF-8. Expected a JSON file."), 400
-    except json.JSONDecodeError as e:
-        return render_page(error=f"Invalid JSON: {e}"), 400
+        obj = restricted_loads(data)
+    except pickle.UnpicklingError as e:
+        return render_page(error=f"Unsafe pickle rejected: {e}"), 400
+    except Exception as e:
+        return render_page(error=f"Deserialization failed: {e}"), 500
 
-    return render_page(parsed=json.dumps(obj, indent=2), message="Partner record imported successfully.")
+    return render_page(parsed=repr(obj), message="Partner record imported with restricted pickle rules.")
 
 if __name__ == '__main__':
     app.run(debug=True, port=8090)

@@ -1,0 +1,7 @@
+Case: case-4821
+Customer: Alice Carter
+Priority: High
+Artifacts:
+- auth-reset.log
+- device-checks.json
+- escalation-notes.txt
